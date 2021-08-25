@@ -1,0 +1,9 @@
+[submodule "fract"]
+	path = fract
+	url = git@github.com:LogicEu/fract
+[submodule "photon"]
+	path = photon
+	url = git@github.com:LogicEu/photon
+[submodule "imgtool"]
+	path = imgtool
+	url = git@github.com:LogicEu/imgtool
