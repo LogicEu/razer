@@ -16,6 +16,7 @@ inc=(
     -Iimgtool/
     -Ifract/
     -Iphoton/
+    -Imass/
     -I.
 )
 
@@ -24,6 +25,8 @@ lib=(
     -limgtool
     -lfract
     -lphoton
+    -lmass
+    -lutopia
     -lz
     -lpng
     -ljpeg

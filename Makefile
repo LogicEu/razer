@@ -4,7 +4,7 @@ STD=-std=c99
 WFLAGS=-Wall -Wextra
 OPT=-O2
 IDIR=-I. -Iinclude
-LIBS=fract photon imgtool
+LIBS=fract photon imgtool mass utopia
 CC=gcc
 NAME=razer
 SRC=*.c
@@ -41,5 +41,5 @@ $(LDIR)%.a: %
 clean:
 	rm -r $(LDIR) && rm $(NAME)
 	
-install: $(NAME)
-	sudo cp $^ /usr/local/bin/
+exe:
+	$(CC) -o $(NAME) $(SRC) $(CFLAGS) $(LFLAGS) $(OSFLAGS)
