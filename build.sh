@@ -5,6 +5,11 @@ cc=gcc
 src=*.c
 std='-std=c99'
 
+if echo "$OSTYPE" | grep -q "linux"; then
+    rflag="-Wl,--whole-archive"
+    lflag="-Wl,--no-whole-archive"
+fi
+
 flags=(
     -Wall
     -Wextra
@@ -17,16 +22,19 @@ inc=(
     -Ifract/
     -Iphoton/
     -Imass/
+    -Iutopia/
     -I.
 )
 
 lib=(
     -Llib/
+    $rflag
     -limgtool
     -lfract
     -lphoton
     -lmass
     -lutopia
+    $lflag
     -lz
     -lpng
     -ljpeg
@@ -56,6 +64,8 @@ build() {
     lib_build imgtool -slib
     lib_build photon -s
     lib_build fract -s
+    lib_build mass -s
+    lib_build utopia -slib
 }
 
 comp() {
