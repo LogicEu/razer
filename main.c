@@ -10,6 +10,25 @@ static uint8_t blue[] = {0, 0, 255, 255};
 static uint8_t red[] = {0, 255, 0, 255};
 float n;
 
+static inline uint8_t ulerp(uint8_t a, uint8_t b, float t)
+{
+    return (int)lerpf((float)a, (float)b, t);
+}
+
+void px_circle(bmp_t* bmp, Circle c)
+{
+    uint8_t* px = bmp->pixels;
+    for (int y = 0; y < bmp->height; y++) {
+        for (int x = 0; x < bmp->width; x++) {
+            vec2 p = {x, y};
+            bool hit = circle_point_overlap(c, p);
+            *px = *px * !hit + 255 * hit;
+            px += bmp->channels;
+        }
+    }
+
+}
+
 void px_line(bmp_t* bmp, vec2 p1, vec2 p2)
 {
     vec2 d = vec2_sub(p2, p1);
@@ -24,11 +43,6 @@ void px_line(bmp_t* bmp, vec2 p1, vec2 p2)
         if (x < 0 || y < 0 || x > bmp->width || y > bmp->height) continue;
         memcpy(px_at(bmp, x, y), &red[0], bmp->channels);
     }
-}
-
-uint8_t ulerp(uint8_t a, uint8_t b, float t)
-{
-    return (int)lerpf((float)a, (float)b, t);
 }
 
 void px_raster(bmp_t* bmp, unsigned int x, unsigned int y, int samples)
@@ -81,8 +95,29 @@ int main(int argc, char** argv)
         }
     }
      
-    px_line(&bmp, vec2_new(0, 0), vec2_new(500, 300));
-    
+    vec2 pa = vec2_new(0, 0), pb = vec2_new(500, 300), p;
+    px_line(&bmp, pa, pb);
+    if (line2D_intersect(pa, pb, t.a, t.b, &p)) {
+        px_circle(&bmp, circle_new(p, 10.0));
+    }
+    if (line2D_intersect(pa, pb, t.a, t.c, &p)) {
+        px_circle(&bmp, circle_new(p, 10.0));
+    }
+    if (line2D_intersect(pa, pb, t.b, t.c, &p)) {
+        px_circle(&bmp, circle_new(p, 10.0));
+    }
+
+    Ray2D ray = ray2D_new(vec2_new(600, 400), vec2_norm(vec2_sub(vec2_new(-600, -400), p)));
+    Hit2D hit;
+    px_circle(&bmp, circle_new(ray.orig, 10.0));
+    if (tri2D_hit(&t, &ray, &hit)) {   
+        vec2 P = ray2D_at(&ray, hit.t);
+        px_circle(&bmp, circle_new(P, 10.0));
+        px_line(&bmp, ray.orig, P);
+        px_line(&bmp, P, vec2_add(P, vec2_mult(hit.normal, 20.0)));
+        px_line(&bmp, P, vec2_add(P, vec2_mult(vec2_reflect(ray.dir, hit.normal), 40.0)));
+    }
+    px_line(&bmp, t.a, t.b);
     bmp_write(path, &bmp);
     bmp_free(&bmp);
 
